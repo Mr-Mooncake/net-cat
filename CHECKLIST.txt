@@ -8,7 +8,7 @@ learn what each line does. Don't keep code you can't explain.
 
 Members:  A = server & connections   B = client session & welcome
           C = messages & broadcast
-Names:    A: ________   B: ________   C: ________
+Names:    A: Mohammed Abu Hasan   B: ________   C: ________
 
 Rules (read before starting)
 - Go only. Packages: io, log, os, fmt, net, sync, time, bufio, errors,
@@ -48,10 +48,10 @@ Milestone 0 — Kickoff <all, first hour>
 
 Milestone 1 — Hello TCP <A>
 Before you start: nothing to wait for.
-[ ] Understand what TCP, a socket, IP, and a port are
-[ ] Listen on 8989 (or the given port), accept a connection
-[ ] Print "Listening on the port :8989"
-[ ] Connect with `nc` and confirm it works
+[ done ] Understand what TCP, a socket, IP, and a port are
+[ done ] Listen on 8989 (or the given port), accept a connection
+[ done ] Print "Listening on the port :8989"
+[ done ] Connect with `nc` and confirm it works
 Each peer does: read about net.Listen / net.Conn, os.Args.
 
 Milestone 2 — Welcome & Name <B>
