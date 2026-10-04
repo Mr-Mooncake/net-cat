@@ -1,371 +1,125 @@
-==============================================================================
- TCP-CHAT (NetCat in Go) - PROJECT PLAN & CHECKLIST
-==============================================================================
- Team:      Member A: ____________   Member B: ____________   Member C: ____________
- Start:     Sunday    04 Oct 2026   (Day 1)
- Deadline:  Wednesday 07 Oct 2026   (Day 4)
- Legend:    [ ] to do    [~] in progress    [x] done
+TCP Chat Project — Checklist
+============================
 
- Schedule at a glance
-   Day 1  Sun 04 Oct  Kickoff + agree on the "contract" + build your own piece in isolation
-   Day 2  Mon 05 Oct  Build the core logic of your piece
-   Day 3  Tue 06 Oct  Connect the pieces together (integration) + error handling
-   Day 4  Wed 07 Oct  Testing, cleanup, review, and "explain your code" practice
+Goal: Recreate NetCat in Go as a TCP group chat (server + up to 10 clients).
+Deadline: Sunday 04 Oct -> Wednesday 07 Oct (4 days), 3 members.
+Methodology: Search first, try it yourself. Only if stuck, ask an AI and
+learn what each line does. Don't keep code you can't explain.
 
+Members:  A = server & connections   B = client session & welcome
+          C = messages & broadcast
+Names:    A: ________   B: ________   C: ________
 
-==============================================================================
- SECTION 0 - HOW WE LEARN  (everyone reads this before touching any code)
-==============================================================================
- These concepts are new to us, so the answers are NOT written in this plan.
- For every task, follow these steps in order:
+Rules (read before starting)
+- Go only. Packages: io, log, os, fmt, net, sync, time, bufio, errors,
+  strings, reflect. (Tests need "testing" - confirm with your supervisor.)
+- Must use goroutines AND channels or mutexes. Max 10 connections.
+- Exact texts: [USAGE]: ./TCPChat $port | Listening on the port :8989 |
+  [ENTER YOUR NAME]: | [YYYY-MM-DD HH:MM:SS][name]:message
+- Edit only your own files. Want to rename an agreed function? Tell the team.
+- One Git branch per member. Merge to main only when it builds.
+- Shared data (clients, history) is always protected (mutex or channel).
+- No bonus until every core box is ticked.
 
-   1. READ the task and its "Search hints".
-   2. SEARCH on your own (Tour of Go, Go by Example, pkg.go.dev, man nc,
-      YouTube, Stack Overflow). Time-box yourself: about 45-60 minutes per task.
-   3. TRY to write it yourself, even if it is wrong or ugly. Run it. Read the error.
-   4. STILL STUCK? Only now ask an AI. Rules:
-        - Paste YOUR attempt and the error, not just the task.
-        - Ask for an explanation line by line, not only the final code.
-        - Ask "why" questions: why a goroutine here? why a mutex here?
-   5. AFTER getting an answer: close it, then re-type the code yourself from
-      understanding. Add a comment on each important line in your own words.
-   6. Write 3-5 lines of what you learned in notes/member_X.txt.
-   7. At the daily sync, say which parts you needed AI for, so the team studies them too.
+Folder structure
+TCPChat/
+  main.go            (A) run with: go run .
+  go.mod             (A)
+  server/
+    server.go        (A)  server_test.go     (A)
+    client.go        (B)  client_test.go     (B)
+    banner.go        (B)
+    message.go       (C)  broadcast_test.go  (C)
+    history.go       (C)
+    broadcast.go     (C)
+  notes/             learning notes, one file per member
+  logs/              used by a bonus task
 
- Golden rule: if you cannot explain a line to your teammates, the line is not done.
+-----------------------------------------------------------------------
+Day 1 — Sunday
+-----------------------------------------------------------------------
+Milestone 0 — Kickoff <all, first hour>
+[ ] Read the subject together
+[ ] Agree on function names: Start, handleClient, registerClient,
+    unregisterClient, broadcast, sendHistory
+[ ] Decide: does the sender see their own message? Are join/leave
+    notices saved in history?
+[ ] B pushes the Client type (name + connection) so C can use it
 
+Milestone 1 — Hello TCP <A>
+Before you start: nothing to wait for.
+[ ] Understand what TCP, a socket, IP, and a port are
+[ ] Listen on 8989 (or the given port), accept a connection
+[ ] Print "Listening on the port :8989"
+[ ] Connect with `nc` and confirm it works
+Each peer does: read about net.Listen / net.Conn, os.Args.
 
-==============================================================================
- SECTION 1 - GLOBAL RESTRICTIONS  (apply to ALL members, ALL days)
-==============================================================================
- [ ] R1  Language: Go only.
- [ ] R2  Allowed packages ONLY: io, log, os, fmt, net, sync, time, bufio,
-         errors, strings, reflect.
-         (Test files need the standard "testing" package - the subject recommends
-          tests, but confirm with your supervisor/auditor that it is accepted.)
-         No third-party packages in the core project.
- [ ] R3  The project MUST use goroutines AND (channels or mutexes).
- [ ] R4  Maximum 10 simultaneous connections.
- [ ] R5  Exact texts from the subject must match character for character:
-           - usage message:   [USAGE]: ./TCPChat $port
-           - listening line:  Listening on the port :PORT
-           - welcome line:    Welcome to TCP-Chat!
-           - name prompt:     [ENTER YOUR NAME]:
-           - message format:  [YYYY-MM-DD HH:MM:SS][name]:message
- [ ] R6  Default port is 8989 when no argument is given.
- [ ] R7  Good practices: run gofmt before every commit, meaningful names,
-         short functions, comments on non-obvious code, no ignored errors
-         (never silently drop an `err`).
- [ ] R8  Shared data (client list, history, counters) must NEVER be read/written
-         from several goroutines without protection.
- [ ] R9  Do NOT edit a file owned by another member. Ask them, or agree on the
-         change at the daily sync.
- [ ] R10 Do NOT rename/change an agreed name or signature (Section 3) without
-         telling the whole team first.
- [ ] R11 Git: one branch per member (e.g. member-a, member-b, member-c).
-         Merge into main only when `go build ./...` passes and your piece works.
-         Never push code that breaks main.
- [ ] R12 Do NOT use time.Sleep to "fix" timing problems - that hides bugs.
- [ ] R13 Do NOT start any bonus task until ALL core items in Section 8 are checked
-         (see BONUS_CHECKLIST.txt).
- [ ] R14 No copy-paste of code you do not understand (see Section 0).
+Milestone 2 — Welcome & Name <B>
+Before you start: nothing to wait for. Copy the logo exactly from the subject.
+[ ] Send "Welcome to TCP-Chat!", the Linux logo, "[ENTER YOUR NAME]: "
+[ ] Read the name; reject empty names (ask again)
+Each peer does: look up bufio.Reader, raw strings (backticks), strings.TrimSpace.
 
+Milestone 3 — Message Format & History <C>
+Before you start: nothing to wait for (needs B's Client type only later).
+[ ] Format: [timestamp][name]:message
+[ ] Store all messages in order, safe for concurrent use
+Each peer does: look up time.Now().Format, slices/structs, sync.Mutex.
 
-==============================================================================
- SECTION 2 - FOLDER / FILE MAP & OWNERSHIP
-==============================================================================
- TCPChat/
- |-- main.go               <- run from here: `go run .`            (Member A)
- |-- go.mod                                                         (Member A)
- |-- CHECKLIST.txt         <- this file                             (everyone ticks)
- |-- BONUS_CHECKLIST.txt                                            (later)
- |-- server/
- |     |-- server.go       listener, accept loop, connection limit  (Member A)
- |     |-- server_test.go                                           (Member A)
- |     |-- client.go       Client type, per-client session loop    (Member B)
- |     |-- banner.go       welcome text + Linux logo               (Member B)
- |     |-- client_test.go                                           (Member B)
- |     |-- message.go      message type + time/format helpers      (Member C)
- |     |-- history.go      stored chat history                     (Member C)
- |     |-- broadcast.go    client registry + sending to everyone   (Member C)
- |     |-- broadcast_test.go                                        (Member C)
- |-- notes/
- |     |-- member_A.txt, member_B.txt, member_C.txt   <- your learning notes
- |-- logs/                 <- empty for now, used by a bonus task
+-----------------------------------------------------------------------
+Day 2 — Monday
+-----------------------------------------------------------------------
+Milestone 4 — Multiple Connections & Limit <A>
+Before you start: Milestone 1 is done.
+[ ] Accept many clients, each in its own goroutine
+[ ] Limit to 10; reject extras; free the slot when someone leaves
+Each peer does: look up go func(), sync.Mutex, buffered channels.
 
- All files in server/ use `package server`. main.go uses `package main`.
- main.go stays OUTSIDE server/ and only starts the program.
+Milestone 5 — Client Chat Loop <B>
+Before you start: Milestone 2 is done. Don't touch history or broadcast code.
+[ ] Read lines in a loop; drop empty messages
+[ ] Detect leaving (exit, Ctrl+C) without crashing; close the connection
+[ ] Re-show the prompt like the subject's example
+Each peer does: look up bufio.Scanner vs Reader, io.EOF.
 
+Milestone 6 — Broadcast <C>
+Before you start: Milestone 3 is done and B's Client type is pushed.
+[ ] Keep the list of connected clients (protected)
+[ ] Send every message to all clients; one broken client must not block others
+Each peer does: look up chan, select, sync.RWMutex.
 
-==============================================================================
- SECTION 3 - THE CONTRACT  (agree on it TOGETHER at kickoff, Day 1 morning)
-==============================================================================
- Why: three people write three files at the same time. The pieces only fit
- if everyone agrees on the names and who calls whom. Spend ~30-45 minutes
- on this, on paper or a whiteboard, BEFORE writing code.
+-----------------------------------------------------------------------
+Day 3 — Tuesday
+-----------------------------------------------------------------------
+Milestone 7 — Join/Leave & History on Join <C leads, B helps>
+Before you start: Milestones 5 and 6 are done.
+[ ] Tell others "X has joined our chat..." / "X has left our chat..."
+[ ] New client receives all previous messages
+[ ] When someone leaves, the others stay connected
+Each peer does: re-read the subject's example output closely.
 
- Proposed names (change them if you all agree, then update this section):
+Milestone 8 — Robustness, Usage & Integration <A + B, then all>
+Before you start: Milestones 4 and 7 are done.
+[ ] Default port 8989, custom port, wrong arguments -> usage message
+[ ] Server and client errors handled (no crashes)
+[ ] Integrate together on one screen. Merge order: C, then B, then A
+Each peer does: look up error handling patterns in Go.
 
-   Who provides it   Name                          Called by
-   ---------------   ----------------------------  -----------------
-   Member A          Start(port string) error       main.go
-   Member B          handleClient(conn net.Conn)    Member A (one goroutine per connection)
-   Member C          registerClient(c *Client)      Member B
-   Member C          unregisterClient(c *Client)    Member B
-   Member C          sendHistory(c *Client)         Member B
-   Member C          broadcast(msg, sender)         Member B
-   Member C          announceJoin(c) / announceLeave(c)   Member B
-   Member C          formatMessage(name, text)      Member C / Member B
+-----------------------------------------------------------------------
+Day 4 — Wednesday
+-----------------------------------------------------------------------
+Milestone 9 — Testing & Review <all>
+[ ] Unit tests: server + limit (A), name + empty message (B), broadcast (C)
+[ ] Test with 3+ `nc` terminals: 11th client, empty message, Ctrl+C,
+    history for a new client, someone leaving
+[ ] gofmt and go vet are clean
+[ ] Swap review: A reviews B, B reviews C, C reviews A
+[ ] Everyone explains one other member's file, line by line
+Each peer does: look up go test, testing package.
 
- Things to decide together and write down here:
-   [ ] Client fields (at minimum: the name and the connection): ______________
-   [ ] Where shared state lives (package-level variables or a Server struct): ______________
-   [ ] Does a sender see their own message echoed back? (study the example
-       output in the subject carefully): ______________
-   [ ] Are "joined"/"left" notices stored in the history? (study the example): ______________
-   [ ] Are duplicate names allowed? Max name length? (the subject only demands non-empty): ______________
-   [ ] What does the 11th client see before being disconnected?: ______________
-   [ ] Invalid port such as "abc" or 99999 - what do we print?: ______________
-
- Day 1 unblock rule: Member B pushes the Client type (just the type, no logic)
- to main within the first hour, so Member C can use it.
-
- If a function from another member is not ready yet, write a temporary
- placeholder in your OWN local test file (do not commit it, do not put it
- in their file). Remove it when the real one arrives.
-
-
-==============================================================================
- SECTION 4 - DAILY RHYTHM (everyone, every day)
-==============================================================================
- [ ] Morning: pull main, read this checklist, pick today's tasks.
- [ ] Midday: 10-minute sync -> "What I did / What blocks me / What I need from you".
- [ ] Evening: merge finished work, tick boxes here, add notes to notes/member_X.txt.
-
-
-==============================================================================
- SECTION 5 - MEMBER A : SERVER & CONNECTIONS
- Files: main.go, go.mod, server/server.go, server/server_test.go
-==============================================================================
- >>> RESTRICTIONS - READ BEFORE YOU START <<<
-   - You own: main.go, go.mod, server/server.go, server/server_test.go. Nothing else.
-   - Do NOT write the welcome text, name handling, message reading (Member B)
-     or broadcast/history (Member C).
-   - Your start-up code must work alone on Day 1: a listener that accepts a
-     connection and closes it is enough for now.
-   - The connection limit is YOUR responsibility. Count safely (R8).
-   - Print exactly the texts from the subject (R5, R6).
-   - You need from others: handleClient (B). Until it exists, use a local placeholder.
-   - Others need from you: Start(port) and the accept loop. Push a first
-     working version by the end of Day 1.
-
- DAY 1 - Sun 04 Oct
- [ ] Attend kickoff, fill in the contract (Section 3)
- [ ] main.go: choose the port from the command line (none -> 8989; one -> that
-     port; anything else -> print the usage message and stop)
- [ ] go.mod created (module name: TCPChat)
- [ ] Print "Listening on the port :PORT" once the server really listens
- [ ] server.go: open a TCP listener and handle the error if the port is taken
-       Search hints: "Go net.Listen TCP example", "Go os.Args", "Go exit codes"
- Done when: `go run .` and `go run . 2525` print the right line; `go run . 2525 localhost`
-            prints the usage message; `nc localhost 8989` connects.
-
- DAY 2 - Mon 05 Oct
- [ ] Accept loop: keep accepting connections forever
- [ ] Handle every connection in its own goroutine
- [ ] Connection limit of 10: decide what happens to the 11th and free the slot
-     when someone leaves
-       Search hints: "Go goroutine", "Go accept loop", "sync.Mutex", "buffered
-       channel as a semaphore" (compare both ideas, then choose one)
- Done when: 10 `nc` clients connect, the 11th is refused cleanly, and after one
-            leaves a new client can join.
-
- DAY 3 - Tue 06 Oct
- [ ] Server-side error handling: an Accept error or one bad client must NOT
-     crash the whole server
- [ ] Wire real handleClient (B) into the accept loop (replace your placeholder)
- [ ] Join the integration session with B and C (Section 9)
-
- DAY 4 - Wed 07 Oct
- [ ] server_test.go: test that the server starts and that the limit works
-       Search hints: "Go testing package", "Go net.Dial in tests", "testing a TCP server in Go"
- [ ] Write the manual test steps with multiple `nc` terminals (Section 8)
- [ ] Run gofmt and go vet on the whole project
- [ ] Optional: try `go run -race .` and `go test -race ./...`
- [ ] Prepare to explain main.go and server.go line by line
-
-
-==============================================================================
- SECTION 6 - MEMBER B : CLIENT SESSION & WELCOME
- Files: server/client.go, server/banner.go, server/client_test.go
-==============================================================================
- >>> RESTRICTIONS - READ BEFORE YOU START <<<
-   - You own: server/client.go, server/banner.go, server/client_test.go.
-   - You define the Client type FIRST (first hour of Day 1), then push it. Member C waits for it.
-   - Do NOT change how messages are formatted or stored (Member C) and do NOT
-     touch the listener or the connection limit (Member A).
-   - The Linux logo and welcome text must match the subject EXACTLY (spaces
-     and backslashes included). Copy it from the subject document.
-   - A client's problems must never affect other clients: a disconnect or a
-     write error on one connection must not stop the rest (a subject requirement).
-   - Always close the connection when the session ends.
-   - You need from others: registerClient, sendHistory, broadcast,
-     announceJoin/Leave, unregisterClient (C). Use local placeholders until ready.
-   - Others need from you: the Client type (C, Day 1) and handleClient (A, Day 2).
-
- DAY 1 - Sun 04 Oct
- [ ] Attend kickoff, fill in the contract (Section 3)
- [ ] Define the Client type, push it to main (within the first hour)
- [ ] banner.go: store the welcome line + Linux logo + name prompt
- [ ] Send the welcome text to a connection and wait for a name
-       Search hints: "Go write string to net.Conn", "Go bufio.NewReader ReadString",
-       "Go raw string literal backticks" (the logo has backslashes!)
- Done when: `nc localhost PORT` shows the logo and "[ENTER YOUR NAME]: " and
-            waits for input.
-
- DAY 2 - Mon 05 Oct
- [ ] Name check: empty name is NOT accepted (ask again). Apply the other name
-     rules you decided in the contract (trim spaces, length, duplicates)
- [ ] Read lines from the client in a loop
- [ ] Empty messages are never broadcast
- [ ] Detect a client leaving (normal exit, Ctrl+C, closed terminal) without
-     crashing
-       Search hints: "Go read from net.Conn until EOF", "bufio.Scanner vs bufio.Reader",
-       "strings.TrimSpace", "io.EOF", "nc Ctrl+C what does the server see"
- [ ] Re-show the prompt after each line like the subject's example does
- Done when: you can type in `nc`, empty lines are ignored, and closing `nc` ends
-            only your session (use placeholders for broadcast).
-
- DAY 3 - Tue 06 Oct
- [ ] Real integration, in this order: name accepted -> registerClient ->
-     sendHistory -> announceJoin -> message loop (broadcast) -> on exit:
-     unregisterClient -> announceLeave -> close the connection
- [ ] Client-side error handling (failed write, failed read)
- [ ] Check for goroutines that never end after a client leaves
- [ ] Join the integration session with A and C (Section 9)
-
- DAY 4 - Wed 07 Oct
- [ ] client_test.go: test name validation and an empty-message case
-       Search hints: "Go net.Pipe testing", "table-driven tests in Go"
- [ ] Edge cases: only spaces as name, very long line, client disconnects
-     right after connecting, client disconnects while typing a name
- [ ] gofmt + comments on tricky parts
- [ ] Prepare to explain client.go and banner.go line by line
-
-
-==============================================================================
- SECTION 7 - MEMBER C : MESSAGES, HISTORY & BROADCAST
- Files: server/message.go, server/history.go, server/broadcast.go,
-        server/broadcast_test.go
-==============================================================================
- >>> RESTRICTIONS - READ BEFORE YOU START <<<
-   - You own: message.go, history.go, broadcast.go, broadcast_test.go.
-   - You need the Client type from B. Until B pushes it (Day 1, first hour),
-     work on message.go and history.go, which do not need it.
-   - You are the ONLY one who touches the client list and the history. Everyone
-     else goes through your functions. Protect them from concurrent access (R8).
-   - One slow or broken client must NEVER block messages to the others.
-   - The message format is exact: [YYYY-MM-DD HH:MM:SS][name]:message (R5).
-   - Do NOT read from or handle connections' input (Member B) and do NOT
-     touch accept/limit logic (Member A). You only WRITE to clients.
-   - You need from others: the Client type (B).
-   - Others need from you: all the functions in the contract table (Section 3).
-     Push placeholders with the right names early (Day 2 morning) so B can compile.
-
- DAY 1 - Sun 04 Oct
- [ ] Attend kickoff, fill in the contract (Section 3)
- [ ] message.go: build the formatted line with the CURRENT time and the name
-       Search hints: "Go time.Now Format layout", "Go reference time 2006-01-02 15:04:05"
- [ ] history.go: store messages in order and return all of them safely
-       Search hints: "Go slice append", "Go sync.Mutex Lock Unlock", "Go copy slice"
- Done when: a small test (or temporary main of your own) prints correctly formatted
-            lines and returns the history in order, even if several goroutines add at once.
-
- DAY 2 - Mon 05 Oct
- [ ] broadcast.go: keep the list of connected clients (add / remove / list)
- [ ] broadcast: send a message to every connected client (follow your contract
-     decision about the sender)
- [ ] A failed write to one client does not stop the others
-       Search hints: "Go concurrent map access", "sync.RWMutex", "Go channels
-       fan-out pattern", "per-client outgoing channel" (compare ideas, then choose)
- [ ] Push function placeholders for B to compile against (early in the day)
- Done when: with two fake clients you can broadcast and both receive it.
-
- DAY 3 - Tue 06 Oct
- [ ] announceJoin / announceLeave: "NAME has joined our chat..." /
-     "NAME has left our chat..." sent to everyone else
- [ ] sendHistory: a new client receives all earlier messages before chatting
- [ ] Check the subject's example: what exactly is stored in history, and in
-     which order does the newcomer see things?
- [ ] Join the integration session with A and B (Section 9)
-
- DAY 4 - Wed 07 Oct
- [ ] broadcast_test.go: several goroutines broadcasting at the same time
-       Search hints: "Go race detector", "go test -race"
- [ ] Check: client leaves -> the others stay connected and keep chatting
- [ ] gofmt + comments
- [ ] Prepare to explain message.go, history.go and broadcast.go line by line
-
-
-==============================================================================
- SECTION 8 - FINAL CORE CHECKLIST  (from the subject - tick together on Day 4)
-==============================================================================
- Test with at least 3 terminals running `nc localhost PORT`.
-
- Startup
- [ ] `go run .` listens on :8989                                      (A)
- [ ] `go run . 2525` listens on :2525                                 (A)
- [ ] `go run . 2525 localhost` prints [USAGE]: ./TCPChat $port        (A)
-
- Connection
- [ ] TCP server with multiple clients (1 server -> many clients)      (A)
- [ ] Maximum 10 connections enforced; slot freed when someone leaves  (A)
- [ ] Server has goroutines AND channels or mutexes                    (A,B,C)
-
- Client session
- [ ] Welcome message + Linux logo shown exactly as in the subject     (B)
- [ ] Name is required; empty name not accepted                        (B)
- [ ] Empty messages are not broadcast                                 (B)
- [ ] Clients can send messages to the chat                            (B)
-
- Messages
- [ ] Format is [YYYY-MM-DD HH:MM:SS][name]:message                    (C)
- [ ] All clients receive messages sent by others                      (C)
- [ ] New client receives all previous messages                        (C)
- [ ] Others are told when a client joins                              (C)
- [ ] Others are told when a client leaves                             (C)
- [ ] When a client leaves, the others do NOT disconnect               (A,B,C)
-
- Quality
- [ ] Server-side errors handled (no crash)                            (A)
- [ ] Client-side errors handled (abrupt close, Ctrl+C)                (B)
- [ ] Only allowed packages used                                       (all)
- [ ] gofmt + go vet clean                                             (all)
- [ ] Test files exist for server connection and client                (A,B,C)
- [ ] Each member can explain EVERY file, not only their own           (all)
-
- Edge cases to try
- [ ] 11th client tries to join
- [ ] Name with spaces only
- [ ] Client closes the terminal while typing their name
- [ ] Two clients send messages at the same moment
- [ ] A client leaves while another is joining
-
-
-==============================================================================
- SECTION 9 - SHARED SESSIONS
-==============================================================================
- Day 1 morning   [ ] KICKOFF (all): read the subject together, fill in Section 3,
-                     create the Git repo, add everyone, create the folder structure.
- Day 3 afternoon [ ] INTEGRATION (all, one screen): merge in this order:
-                       1) Member C's pieces (no dependencies on others)
-                       2) Member B's pieces (uses C)
-                       3) Member A wires everything in the accept loop
-                     Fix compile errors together; run 2 clients first, then 3+.
- Day 4 morning   [ ] FULL TEST (all): go through Section 8.
- Day 4 midday    [ ] CODE REVIEW: each member reviews another member's file
-                     (A reviews B, B reviews C, C reviews A). Leave comments,
-                     do not edit their file (R9).
- Day 4 afternoon [ ] EXPLAIN-YOUR-CODE: every member explains one other
-                     member's file out loud, line by line. If someone cannot,
-                     the owner teaches it. Then final gofmt/vet, final merge.
+Final check
+[ ] go run . / go run . 2525 / go run . 2525 localhost (usage)
+[ ] Welcome + logo + name required; empty messages not sent
+[ ] Format, history, join/leave, others stay connected
+[ ] Max 10 connections; goroutines + channels/mutexes
+[ ] Only allowed packages; tests exist

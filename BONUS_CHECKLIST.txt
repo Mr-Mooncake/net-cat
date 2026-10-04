@@ -1,167 +1,52 @@
-==============================================================================
- TCP-CHAT - BONUS CHECKLIST
-==============================================================================
- Legend: [ ] to do    [~] in progress    [x] done
- Same learning rules as CHECKLIST.txt, Section 0: search first, try it, and
- only then ask an AI and learn each line.
+TCP Chat Project — Bonus Checklist
+==================================
 
+Same methodology: search first, try it yourself, then ask an AI and learn
+each line.
 
-==============================================================================
- RESTRICTIONS - READ BEFORE ANYONE STARTS A BONUS TASK
-==============================================================================
- [ ] B1  START CONDITION: every item in CHECKLIST.txt Section 8 is ticked.
-         The core project always comes first. Bonus on a broken core earns nothing.
- [ ] B2  Do NOT break the core. After each bonus, re-run the whole core test
-         list (CHECKLIST.txt, Section 8). If anything fails, fix it or do not merge.
- [ ] B3  One branch per bonus task (e.g. bonus-rename, bonus-logs). Merge only
-         when it works AND the core still passes.
- [ ] B4  Keep bonus code in NEW files where possible, so core files change as
-         little as possible. If you must change a core file, tell its owner first.
- [ ] B5  Only external package allowed: github.com/jroimartin/gocui, and ONLY for
-         the Terminal UI task. Everything else stays within the allowed list:
-         io, log, os, fmt, net, sync, time, bufio, errors, strings, reflect.
- [ ] B6  Adding gocui changes go.mod. Only ONE person does this, on its own
-         branch, and the team agrees before merging.
- [ ] B7  Plain `nc` must still work with the default mode. A bonus feature must
-         not be required to use the chat.
- [ ] B8  Never use time.Sleep to fix timing problems. Protect shared data
-         (mutex/channels) like in the core project.
- [ ] B9  Decide with the team BEFORE coding each task what the user types
-         (command names, flags, formats) and write it under the task.
- [ ] B10 Be realistic: with a 4-day deadline, bonus work only fits if the core is
-         finished early. Do the easier tasks first (order below), and stop when time runs out.
+Rules (read before starting)
+- Start only when every core box in CHECKLIST.txt is ticked.
+- Never break the core: re-run the Final check after each bonus.
+- One Git branch per bonus. Keep bonus code in new files where possible.
+- Plain `nc` must still work. Same allowed packages as the core.
+- Only exception: gocui (github.com/jroimartin/gocui), only for the
+  Terminal UI. One person adds it to go.mod.
+- Decide commands/flags as a team before coding, and write them down.
+- 4 days is tight: do them in this order and stop when time runs out.
 
+Bonus 1 — Logs saved to a file <A>
+[ ] Decide what to log (joins, leaves, messages, errors)
+[ ] Write to a file in logs/ with timestamps
+[ ] Chat still works if the file can't be opened
+Each peer does: look up log.New, os.OpenFile.
 
-==============================================================================
- SUGGESTED ORDER (easiest -> hardest)
-==============================================================================
-   1) Logs saved to a file
-   2) Clients can change their names  +  3) Group is informed of the rename
-   4) More NetCat flags
-   5) More than one group chat
-   6) Terminal UI with gocui
+Bonus 2 — Clients can change their names <B>
+Before you start: agree the command (e.g. what the user types).
+[ ] The command is not broadcast as a normal message
+[ ] Same name rules as the core
+Each peer does: look up strings.HasPrefix, strings.Fields.
 
- Suggested owners (so work stays balanced; swap if you prefer):
-   Member A: tasks 1 and 4        Member B: tasks 2, 3 and 6        Member C: task 5
+Bonus 3 — Group is told about a name change <B>
+Before you start: Bonus 2 works.
+[ ] Send the notice through C's broadcast functions
+Each peer does: re-check how join/leave notices work.
 
+Bonus 4 — More NetCat flags <A>
+Before you start: read `man nc` and choose a few flags only.
+[ ] Write the chosen flags here: ____________
+[ ] Parse them; wrong flag -> usage message; core usage still works
+Each peer does: look up man nc options, os.Args.
 
-==============================================================================
- TASK 1 - SAVE ALL LOGS INTO A FILE                       (suggested: Member A)
-==============================================================================
- Planned file: server/logger.go      Folder: logs/
- Restrictions before starting:
-   - Use only log, os, time (allowed packages).
-   - Log writing must be safe when many goroutines log at once.
-   - A failure to write the log file must NOT crash the chat.
-   - Decide first: what is logged? (connections, disconnections, every message,
-     errors) and the file name/format.
- [ ] Decide what to log and the file format: ______________
- [ ] Create/open the log file when the server starts
- [ ] Log joins, leaves, messages and server errors with timestamps
- [ ] Chat still works if the file cannot be opened
- [ ] Core checklist still passes
-   Search hints: "Go log.New with file", "os.OpenFile flags append create",
-                 "is log package safe for concurrent use"
+Bonus 5 — More than one group chat <C>
+Before you start: plan on paper (commands, per-group history). Default
+experience must stay the same.
+[ ] Per-group clients and history, protected
+[ ] Commands to create / join / leave / list groups
+[ ] Join/leave notices only reach that group
+Each peer does: look up maps of rooms with a mutex.
 
-
-==============================================================================
- TASK 2 - CLIENTS CAN CHANGE THEIR NAMES                  (suggested: Member B)
-==============================================================================
- Planned file: server/rename.go
- Restrictions before starting:
-   - A rename command line must NOT be broadcast as a normal chat message.
-   - Same name rules as the core (non-empty, duplicates, length).
-   - Normal messages starting with similar text must still work - decide the
-     exact command, e.g. what the user types: ______________
-   - The Client's name may be read by other goroutines while it changes -
-     protect it.
- [ ] Decide the command format and write it here: ______________
- [ ] Detect the command in the message loop (Member B's file)
- [ ] Validate the new name
- [ ] Update the name safely
- [ ] Later messages use the new name
- [ ] Core checklist still passes
-   Search hints: "strings.HasPrefix", "strings.Fields", "Go data race on struct field"
-
-
-==============================================================================
- TASK 3 - GROUP IS INFORMED WHEN A NAME CHANGES           (suggested: Member B)
-==============================================================================
- Depends on: Task 2 (do NOT start before Task 2 works).
- Restrictions before starting:
-   - Send the notice through Member C's broadcast functions; do not write to
-     other clients' connections directly.
-   - Decide whether the notice goes into the history (look at how join/leave
-     notices were handled in the core).
- [ ] Decide the notice text: ______________
- [ ] Everyone except (or including) the renamer receives it - team decision: ______________
- [ ] History handling matches the decision
- [ ] Core checklist still passes
-
-
-==============================================================================
- TASK 4 - IMPLEMENT MORE NETCAT FLAGS                     (suggested: Member A)
-==============================================================================
- Restrictions before starting:
-   - Read `man nc` together first and CHOOSE a small set of flags (the real nc
-     has many). Write the chosen list below. Do not try to do all of them.
-   - Parsing flags must not change the core usage: `go run .` and
-     `go run . 2525` must still work, and the usage message rule from the
-     core still applies for invalid input.
-   - Only allowed packages (no `flag` package unless your supervisor confirms
-     it is allowed; it is not on the allowed list).
- [ ] Chosen flags: ______________
- [ ] Parse them from os.Args
- [ ] Invalid flag -> helpful usage message
- [ ] Each flag actually changes behavior and is tested by hand
- [ ] Core checklist still passes
-   Search hints: "man nc options", "nc -l -p -v meaning", "Go os.Args parsing manually"
-
-
-==============================================================================
- TASK 5 - MORE THAN ONE GROUP CHAT                        (suggested: Member C)
-==============================================================================
- Planned file: server/rooms.go
- Restrictions before starting:
-   - This changes how broadcast and history work (the core assumes ONE group).
-     Member C owns that code, so Member C leads; A and B only adapt their calls.
-   - The default experience must stay the same: a client who does nothing
-     special lands in the single "main" group.
-   - History must be per group, and the 10-connection limit stays global
-     (unless the team decides otherwise - write it down).
-   - Decide first: how does a client create / join / list / leave groups?
-     Commands: ______________
- [ ] Design on paper first (who owns what, which commands): ______________
- [ ] Per-group client lists and history, protected from concurrent access
- [ ] Commands to create / join / leave / list groups
- [ ] Join/leave notices only go to members of that group
- [ ] Core checklist still passes
-   Search hints: "chat room design Go", "map of rooms with mutex", "Go sync.RWMutex"
-
-
-==============================================================================
- TASK 6 - TERMINAL UI WITH GOCUI                          (suggested: Member B)
-==============================================================================
- Planned folder: ui/  (separate from server/)
- Restrictions before starting:
-   - Do this LAST. It is the biggest change and touches go.mod (see B6).
-   - The only external package allowed is https://github.com/jroimartin/gocui.
-   - The server must still work with plain `nc` clients (B7). The UI is an
-     optional client that connects to the server.
-   - Check that you can download the package on your machine/network BEFORE
-     planning the whole task.
- [ ] Read the gocui README and examples; sketch the screen layout on paper
- [ ] Add the dependency (one person only, own branch)
- [ ] Chat view, input view, and (optional) user list view
- [ ] Sending a message from the UI works; receiving updates the screen
- [ ] Exiting cleanly (Ctrl+C) closes the connection
- [ ] Core checklist still passes
-   Search hints: "gocui examples", "gocui SetKeybinding", "Go goroutine update UI safely"
-
-
-==============================================================================
- BONUS FINAL CHECK
-==============================================================================
- [ ] Every merged bonus passed the core checklist (CHECKLIST.txt Section 8)
- [ ] Every member can explain every bonus file line by line
- [ ] Commands/flags are written in a short README so the auditor can try them
+Bonus 6 — Terminal UI <B>
+Before you start: do this last; check that gocui downloads on your machine.
+[ ] Chat view + input view
+[ ] Sending and receiving work; Ctrl+C closes cleanly
+Each peer does: read the gocui README and examples.
