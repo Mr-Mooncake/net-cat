@@ -4,4 +4,4 @@ package server
 //
 // Tests for server start-up and the connection limit.
 //
-// TODO: see CHECKLIST.txt, Section 5, for your tasks and restrictions.
+// TODO: see CHECKLIST.txt for your milestones and rules.
