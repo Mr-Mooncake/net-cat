@@ -8,7 +8,7 @@ learn what each line does. Don't keep code you can't explain.
 
 Members:  A = server & connections   B = client session & welcome
           C = messages & broadcast
-Names:    A: Mohammed Abu Hasan   B: Husain Hani Tammam   C: ________
+Names:    A: Mohammed Abu Hasan   B: ________   C: ________
 
 Rules (read before starting)
 - Go only. Packages: io, log, os, fmt, net, sync, time, bufio, errors,
@@ -44,7 +44,7 @@ Milestone 0 — Kickoff <all, first hour>
     unregisterClient, broadcast, sendHistory
 [ ] Decide: does the sender see their own message? Are join/leave
     notices saved in history?
-[ ] B pushes the Client type (name + connection) so C can use it
+[ done ] B pushes the Client type (name + connection) so C can use it
 
 Milestone 1 — Hello TCP <A>
 Before you start: nothing to wait for.
@@ -56,8 +56,8 @@ Each peer does: read about net.Listen / net.Conn, os.Args.
 
 Milestone 2 — Welcome & Name <B>
 Before you start: nothing to wait for. Copy the logo exactly from the subject.
-[ ] Send "Welcome to TCP-Chat!", the Linux logo, "[ENTER YOUR NAME]: "
-[ ] Read the name; reject empty names (ask again)
+[ done ] Send "Welcome to TCP-Chat!", the Linux logo, "[ENTER YOUR NAME]: "
+[ done ] Read the name; reject empty names (ask again)
 Each peer does: look up bufio.Reader, raw strings (backticks), strings.TrimSpace.
 
 Milestone 3 — Message Format & History <C>
@@ -77,9 +77,9 @@ Each peer does: look up go func(), sync.Mutex, buffered channels.
 
 Milestone 5 — Client Chat Loop <B>
 Before you start: Milestone 2 is done. Don't touch history or broadcast code.
-[ ] Read lines in a loop; drop empty messages
-[ ] Detect leaving (exit, Ctrl+C) without crashing; close the connection
-[ ] Re-show the prompt like the subject's example
+[ done ] Read lines in a loop; drop empty messages
+[ done ] Detect leaving (exit, Ctrl+C) without crashing; close the connection
+[ done ] Re-show the prompt like the subject's example
 Each peer does: look up bufio.Scanner vs Reader, io.EOF.
 
 Milestone 6 — Broadcast <C>
