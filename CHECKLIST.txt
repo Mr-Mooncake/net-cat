@@ -8,7 +8,7 @@ learn what each line does. Don't keep code you can't explain.
 
 Members:  A = server & connections   B = client session & welcome
           C = messages & broadcast
-Names:    A: Mohammed Abu Hasan   B: ________   C: ________
+Names:    A: Mohammed Abu Hasan   B: Husain Hani Tammam   C: ________
 
 Rules (read before starting)
 - Go only. Packages: io, log, os, fmt, net, sync, time, bufio, errors,
