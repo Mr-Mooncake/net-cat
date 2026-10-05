@@ -44,7 +44,7 @@ Milestone 0 — Kickoff <all, first hour>
     unregisterClient, broadcast, sendHistory
 [ ] Decide: does the sender see their own message? Are join/leave
     notices saved in history?
-[ ] B pushes the Client type (name + connection) so C can use it
+[ done ] B pushes the Client type (name + connection) so C can use it
 
 Milestone 1 — Hello TCP <A>
 Before you start: nothing to wait for.
@@ -56,8 +56,8 @@ Each peer does: read about net.Listen / net.Conn, os.Args.
 
 Milestone 2 — Welcome & Name <B>
 Before you start: nothing to wait for. Copy the logo exactly from the subject.
-[ ] Send "Welcome to TCP-Chat!", the Linux logo, "[ENTER YOUR NAME]: "
-[ ] Read the name; reject empty names (ask again)
+[ done ] Send "Welcome to TCP-Chat!", the Linux logo, "[ENTER YOUR NAME]: "
+[ done ] Read the name; reject empty names (ask again)
 Each peer does: look up bufio.Reader, raw strings (backticks), strings.TrimSpace.
 
 Milestone 3 — Message Format & History <C>
