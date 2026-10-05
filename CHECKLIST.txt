@@ -77,9 +77,9 @@ Each peer does: look up go func(), sync.Mutex, buffered channels.
 
 Milestone 5 — Client Chat Loop <B>
 Before you start: Milestone 2 is done. Don't touch history or broadcast code.
-[ ] Read lines in a loop; drop empty messages
-[ ] Detect leaving (exit, Ctrl+C) without crashing; close the connection
-[ ] Re-show the prompt like the subject's example
+[ done ] Read lines in a loop; drop empty messages
+[ done ] Detect leaving (exit, Ctrl+C) without crashing; close the connection
+[ done ] Re-show the prompt like the subject's example
 Each peer does: look up bufio.Scanner vs Reader, io.EOF.
 
 Milestone 6 — Broadcast <C>
