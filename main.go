@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	"net"
 	"os"
+	"TCPChat/server"
 )
 
 // Owner: Member A
@@ -27,29 +27,9 @@ func main() {
 	if len(os.Args) == 2 {
 		port = os.Args[1]
 	}
-
-	address := ":" + port
-
-	listener, err := net.Listen("tcp", address)
+	
+	err := server.Start(port)
 	if err != nil {
-		log.Fatalf("Failed to listen on port %s: %v", port, err)
+		log.Fatal(err)
 	}
-	defer listener.Close() //Ensure the listener closes when main() exits
-	fmt.Printf("Listening on the port %s\n", address)
-
-	// wait until client connects
-	conn, err := listener.Accept()
-	if err != nil {
-		log.Fatalf("Failed to accept connection: %v", err)
-	}
-	defer conn.Close()
-
-	// read what the client sent and print it (just for testing)
-	buf := make([]byte, 1024)
-	n, err := conn.Read(buf)
-	if err != nil {
-		log.Printf("Failed to read message: %v", err)
-		return
-	}
-	fmt.Printf("Recieved: %s", buf[:n])
 }

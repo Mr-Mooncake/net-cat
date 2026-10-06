@@ -71,8 +71,8 @@ Day 2 — Monday
 -----------------------------------------------------------------------
 Milestone 4 — Multiple Connections & Limit <A>
 Before you start: Milestone 1 is done.
-[ ] Accept many clients, each in its own goroutine
-[ ] Limit to 10; reject extras; free the slot when someone leaves
+[ done ] Accept many clients, each in its own goroutine
+[ done ] Limit to 10; reject extras; free the slot when someone leaves
 Each peer does: look up go func(), sync.Mutex, buffered channels.
 
 Milestone 5 — Client Chat Loop <B>
