@@ -1,7 +1,7 @@
 LEARNING NOTES - Member C
 (3-5 lines per task: what I searched, what I learned, what I needed AI for)
 
-Day 1:
+Day 1: Complete the history file and the message file.
 
 Day 2:
 

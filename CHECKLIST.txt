@@ -8,7 +8,7 @@ learn what each line does. Don't keep code you can't explain.
 
 Members:  A = server & connections   B = client session & welcome
           C = messages & broadcast
-Names:    A: Mohammed Abu Hasan   B: Husain Hani Tammam   C: ________
+Names:    A: Mohammed Abu Hasan   B: Husain Hani Tammam   C: Baqer Alasmawi
 
 Rules (read before starting)
 - Go only. Packages: io, log, os, fmt, net, sync, time, bufio, errors,
@@ -62,8 +62,8 @@ Each peer does: look up bufio.Reader, raw strings (backticks), strings.TrimSpace
 
 Milestone 3 — Message Format & History <C>
 Before you start: nothing to wait for (needs B's Client type only later).
-[ ] Format: [timestamp][name]:message
-[ ] Store all messages in order, safe for concurrent use
+[ done ] Format: [timestamp][name]:message
+[ done ] Store all messages in order, safe for concurrent use
 Each peer does: look up time.Now().Format, slices/structs, sync.Mutex.
 
 -----------------------------------------------------------------------
