@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -19,6 +20,17 @@ import (
 type Client struct {
 	Conn net.Conn
 	Name string
+	mu   sync.Mutex // serializes writes to this client's connection
+}
+
+// send writes text to the client with a write deadline,
+// so a stuck connection can't block the sender forever.
+func (c *Client) send(text string) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.Conn.SetWriteDeadline(time.Now().Add(writeTimeout))
+	_, err := c.Conn.Write([]byte(text))
+	return err
 }
 
 // readName prompts and reads lines until a non-empty name is entered.
@@ -49,8 +61,7 @@ func formatPrompt(name string) string {
 
 // showPrompt writes the prompt to the client so they know it's their turn.
 func (c *Client) showPrompt() error {
-	_, err := c.Conn.Write([]byte(formatPrompt(c.Name)))
-	return err
+	return c.send(formatPrompt(c.Name))
 }
 
 // chatLoop reads messages line by line until the client leaves.
@@ -81,7 +92,10 @@ func chatLoop(client *Client, reader *bufio.Reader) {
 			continue
 		}
 
-		// TODO (Member C, Milestone 6): hand msg to broadcast here
+		// Save to history, then send to everyone else
+		m := newMessage(client.Name, msg)
+		chatHistory.Add(m)
+		broadcast(m.String(), client)
 
 		// Re-show the prompt for the next message
 		if err := client.showPrompt(); err != nil {
@@ -94,6 +108,13 @@ func chatLoop(client *Client, reader *bufio.Reader) {
 func handleClient(conn net.Conn) {
 	// Always close the connection when the session ends
 	defer conn.Close()
+
+	// A bug in one session must never crash the whole server
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("client session crashed: %v", r)
+		}
+	}()
 
 	// 1. Send welcome message, Linux logo, and the name prompt
 	if _, err := conn.Write([]byte(WelcomeMessage + PromptName)); err != nil {
@@ -113,11 +134,25 @@ func handleClient(conn net.Conn) {
 		Name: name,
 	}
 
-	// 4. Show the first message prompt
-	if err := client.showPrompt(); err != nil {
+	// 4. Replay all previous messages to the new client
+	if err := sendHistory(client); err != nil {
 		return
 	}
 
-	// 5. Chat loop (Milestone 5): runs until the client leaves
+	// 5. Join the chat and tell the others
+	registerClient(client)
+	broadcast(joinNotice(client.Name), client)
+
+	// 6. When the session ends: remove client and tell the others.
+	// The others stay connected; only this connection closes.
+	defer func() {
+		unregisterClient(client)
+		broadcast(leaveNotice(client.Name), nil)
+	}()
+
+	// 7. Show the first prompt, then run the chat loop
+	if err := client.showPrompt(); err != nil {
+		return
+	}
 	chatLoop(client, reader)
 }
