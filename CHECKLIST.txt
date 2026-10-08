@@ -93,9 +93,9 @@ Day 3 — Tuesday
 -----------------------------------------------------------------------
 Milestone 7 — Join/Leave & History on Join <C leads, B helps>
 Before you start: Milestones 5 and 6 are done.
-[ ] Tell others "X has joined our chat..." / "X has left our chat..."
-[ ] New client receives all previous messages
-[ ] When someone leaves, the others stay connected
+[ done ] Tell others "X has joined our chat..." / "X has left our chat..."
+[ done ] New client receives all previous messages
+[ done ] When someone leaves, the others stay connected
 Each peer does: re-read the subject's example output closely.
 
 Milestone 8 — Robustness, Usage & Integration <A + B, then all>
