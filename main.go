@@ -21,11 +21,16 @@ func main() {
 	port := "8989"
 
 	if len(os.Args) > 2 {
-		fmt.Println("[USAGE]: go run main.go [port]")
+		fmt.Println("[USAGE]: ./TCPChat $port")
 		return
 	}
 	if len(os.Args) == 2 {
 		port = os.Args[1]
+	}
+
+	if !server.ValidPort(port) {
+		fmt.Println("Invalid Port: Port must be in this range 1024 - 65535")
+		return
 	}
 	
 	err := server.Start(port)

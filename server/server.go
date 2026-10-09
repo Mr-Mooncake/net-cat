@@ -19,13 +19,31 @@ var (
 	mu sync.Mutex
 	activeCount int
 )
+
+func ValidPort(s string) bool {
+	if s == "" || len(s) > 5 {
+		return false
+	}
+	n := 0
+	for _, ch := range s {
+		if ch < '0' || ch > '9' {
+			return false
+		}
+		n = n*10 + int(ch-'0')
+	}
+	if n <= 1024 && n >= 65535 {
+		return false
+	}
+	return true
+}
+
 func Start(port string) error {
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
 	}
 	defer listener.Close()
-	fmt.Printf("listening on the port :%s\n", port)
+	fmt.Printf("Listening on the port :%s\n", port)
 	
 	// keeps accepting clients forever
 	for {
