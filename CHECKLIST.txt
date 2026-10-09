@@ -39,10 +39,10 @@ TCPChat/
 Day 1 — Sunday
 -----------------------------------------------------------------------
 Milestone 0 — Kickoff <all, first hour>
-[ ] Read the subject together
-[ ] Agree on function names: Start, handleClient, registerClient,
+[ done ] Read the subject together
+[ done ] Agree on function names: Start, handleClient, registerClient,
     unregisterClient, broadcast, sendHistory
-[ ] Decide: does the sender see their own message? Are join/leave
+[ done ] Decide: does the sender see their own message? Are join/leave
     notices saved in history?
 [ done ] B pushes the Client type (name + connection) so C can use it
 
@@ -84,8 +84,8 @@ Each peer does: look up bufio.Scanner vs Reader, io.EOF.
 
 Milestone 6 — Broadcast <C>
 Before you start: Milestone 3 is done and B's Client type is pushed.
-[ ] Keep the list of connected clients (protected)
-[ ] Send every message to all clients; one broken client must not block others
+[ done ] Keep the list of connected clients (protected)
+[ done ] Send every message to all clients; one broken client must not block others
 Each peer does: look up chan, select, sync.RWMutex.
 
 -----------------------------------------------------------------------
