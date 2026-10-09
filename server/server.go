@@ -53,6 +53,7 @@ func Start(port string) error {
 			continue
 		}
 		if !acquireSlot() {
+			// reject client
 		_, err := conn.Write([]byte("Chat is full. Try again later.\n"))
 		if err != nil {
 			log.Printf("Failed to notify rejected client: %v", err)

@@ -100,9 +100,9 @@ Each peer does: re-read the subject's example output closely.
 
 Milestone 8 — Robustness, Usage & Integration <A + B, then all>
 Before you start: Milestones 4 and 7 are done.
-[ ] Default port 8989, custom port, wrong arguments -> usage message
-[ ] Server and client errors handled (no crashes)
-[ ] Integrate together on one screen. Merge order: C, then B, then A
+[ done ] Default port 8989, custom port, wrong arguments -> usage message
+[ done ] Server and client errors handled (no crashes)
+[ done ] Integrate together on one screen. Merge order: C, then B, then A
 Each peer does: look up error handling patterns in Go.
 
 -----------------------------------------------------------------------
